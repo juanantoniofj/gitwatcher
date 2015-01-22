@@ -12,4 +12,4 @@ REPO_PATH = ''
 
 # Fill in with one-word strings which shall contain
 # part of the name of the commit authors
-USERS = [ 'Xabier', 'Adriana' ]
+USERS = [ ]
