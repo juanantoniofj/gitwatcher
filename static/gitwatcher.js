@@ -1,4 +1,4 @@
-var template = _.template('<div class="commit"><% if (new_tag) {%> <span class="new">new</span> <% } %><span class="hash"><a href="<%= link %>" target="_blank"><%= hash %></a></span><span class="author"><%= author %></span><span class="time"><%= time %> </span><%= message %></div>');
+var template = _.template('<div class="commit <%= reviewed %>" id="<%= hash %>"><% if (new_tag) {%> <span class="new">new</span> <% } %><span class="hash"><a href="<%= link %>" target="_blank"><%= hash %></a></span><span class="commit-message"><span class="author"><%= author %></span><span class="time"><%= time %> </span><span class="message"><%= message %></span></span></div>');
 
 var last_commit = 0;
 var audioElement = undefined;
@@ -34,7 +34,7 @@ function update_all_commits(url, path) {
             last_commit = data[0][0]
             _.each(data, function(commit) {
                 commit[1] = parse_commit_message(commit[1]);
-
+                var reviewed = REVIEWED.indexOf(commit[0]) > - 1 ? true : false;
                 var $column = get_column_for(commit[1].author);
                 $column.append(template({
                     new_tag: false,
@@ -42,9 +42,22 @@ function update_all_commits(url, path) {
                     hash: commit[0],
                     message: commit[1].message,
                     author: commit[1].author,
-                    time: commit[1].time
+                    time: commit[1].time,
+                    reviewed: reviewed ? 'reviewed' : ''
                 }));
+                $('#' + commit[0] + ' .commit-message').click(toggle_reviewed);
             });
+        }
+    });
+}
+
+function toggle_reviewed(event) {
+    $.ajax({
+        url: 'git',
+        type: 'PUT',
+        data: 'hash=' + $(event.currentTarget).parent().attr('id'),
+        success: function() {
+            $(event.currentTarget).parent().toggleClass('reviewed');
         }
     });
 }
@@ -58,7 +71,7 @@ function update_commits(url, path) {
             data = JSON.parse(data);
             
             for (var i = 0, commit = data[i]; i < data.length; i++, commit = data[i]) {
-                if (commit[0] == last_commit) 
+                if (commit[0] == last_commit)
                     break;
                 play_pop();
                 commit[1] = parse_commit_message(commit[1]);
@@ -69,8 +82,18 @@ function update_commits(url, path) {
                     hash: commit[0],
                     message: commit[1].message,
                     author: commit[1].author,
-                    time: commit[1].time
+                    time: commit[1].time,
+                    reviewed: false
                 }));
+                $('#' + commit[0]).click(toggle_reviewed);
+            }
+            for (var i = 0, commit = data[i]; i < data.length; i++, commit = data[i]) {
+                commit[1] = parse_commit_message(commit[1]);
+                var $commit_time = $('#' + commit[0] + ' .time');
+                if ($commit_time.length > 0 && $commit_time.html().trim() != commit[1].time) {
+                    $commit_time.html(commit[1].time);
+                    $commit_time.fadeTo('slow', 0.5).fadeTo('slow', 1.0);
+                }
             }
             last_commit = data[0][0];
         }

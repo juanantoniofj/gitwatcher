@@ -4,8 +4,12 @@ HOST = '0.0.0.0'
 PORT = 8000
 UPDATE_TIME = 5000
 
-REPO_HOST = '10.27.10.10'
-REPO_PATH = "datavis-frontend"
+# Replace with GIT host
+REPO_HOST = ''
 
-# Fill in with one-word strings
-USERS = [ 'Xabier', 'Juan' ]
+# Replace with GIT local cloned repo
+REPO_PATH = ''
+
+# Fill in with one-word strings which shall contain
+# part of the name of the commit authors
+USERS = [ 'Xabier', 'Adriana' ]

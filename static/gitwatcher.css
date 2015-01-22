@@ -23,6 +23,19 @@ body {
 .commit {
     margin: 10px;
     padding: 5px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+.reviewed {
+    background-color: #e2e2e2;
+}
+
+.commit:hover {
+    cursor: pointer;
 }
 
 .hash {
@@ -39,22 +52,23 @@ body {
 }
 
 .author {
-    margin: 10px;
-    border: 1px solid lightseagreen;
     background-color: lightseagreen;
     color: white;
     border-radius: 3px;
-    padding: 3px;
 }
 
 .time {
-    margin: 10px;
-    border: 1px solid rgb(207, 109, 109);
     background-color: rgb(207, 109, 109);
     color: white;
     border-radius: 3px;
+    margin-left: 5px;
+}
+
+.message {
+    margin: 10px;
     padding: 3px;
 }
+
 a {
     font-size: 8px;
     text-decoration: none;
@@ -64,3 +78,4 @@ a:hover {
     font-size: 8px;
     text-decoration: none;
 }
+

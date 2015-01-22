@@ -15,8 +15,12 @@ class GitWatcher(object):
 
     @cherrypy.expose
     def index(self):
+        reviewed = []
+        with sqlite3.connect(settings.DB) as conn:
+            reviewed = [ str(i[0]) for i in conn.execute('SELECT * FROM reviewed').fetchall() ]
+            
         tmpl = lookup.get_template('index.html')
-        return tmpl.render(users=settings.USERS,update_time=settings.UPDATE_TIME,repo_host=settings.REPO_HOST,repo_path=settings.REPO_PATH)
+        return tmpl.render(users=settings.USERS, update_time=settings.UPDATE_TIME, repo_host=settings.REPO_HOST, repo_path=settings.REPO_PATH, reviewed=reviewed)
 
 class GitWatcherInterface(object):
     exposed = True
@@ -35,6 +39,17 @@ class GitWatcherInterface(object):
            
         raw_data = [ l.split(' ', 1) for l in log_lines]
         return json.dumps(raw_data)
+
+    def PUT(self, hash):
+        with sqlite3.connect(settings.DB) as conn:
+            try:
+                conn.execute('INSERT INTO reviewed VALUES ("%s")' % hash)
+                conn.commit()
+                print 'Checking [%s] as reviewed' % hash
+            except sqlite3.IntegrityError:
+                print 'Unchecking [%s] as reviewed' % hash
+                conn.execute('DELETE FROM reviewed WHERE hash="%s"' % hash)
+                conn.commit()
     
 
 if __name__ == '__main__':
